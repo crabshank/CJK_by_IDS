@@ -1,0 +1,249 @@
+<html>
+
+<head>
+<meta charset="UTF-8">
+<script src="cjk_by_ids.js"></script>
+</head>
+	
+<body>
+<script>
+/*
+//get:  [code point, character, ...unique components]
+
+let ch_comp=[];
+
+for(let i=0; len_i=raw_ids.length, i<len_i; i++){
+ch_comp[i]=[raw_ids[i][0],raw_ids[i][1]];
+if(raw_ids[i].length>=3){
+	for(let k=2; len_k=raw_ids[i].length, k<len_k; k++){
+	let curr=[...raw_ids[i][k]];
+		for(let j=0; len_j=curr.length, j<len_j; j++){
+		if(!ch_comp[i].includes(curr[j])){ //avoid duplicates
+			ch_comp[i].push(curr[j]);
+			}
+		}
+	}
+}
+}
+console.log(ch_comp);*/
+
+
+//get:  [code point, character, ...all components (components broken down into simplest forms)]
+/*var ch_comp2=[];
+var smp_components=[];
+
+function simpler_cmp(p){
+	let a=[];
+	
+	let b= ch_comp.filter((c)=>{
+		return c[1]===p;
+	});
+	
+	if(b.length>0){
+		b.forEach((n)=>{
+			if(n.length>=3){
+				for(let k=2; len_k=n.length, k<len_k; k++){
+					a.push(n[k]);
+				}
+			}
+		});
+	}
+	
+	return a;
+}
+
+//get last entry processed logged, pause Chrome debugger when done to access final output arrays:
+
+(async () => {
+
+for(let k=0; len_k=ch_comp.length, k<len_k; k++){
+    await new Promise(resolve => setTimeout(() => {
+     var a=[];
+if(ch_comp[k].length>=2){
+	for(let i=1; len_i=ch_comp[k].length, i<len_i; i++){
+		a.push(ch_comp[k][i]);
+	}
+
+
+	var a_brk=false;
+	var a_cnt=0;
+	
+	while(!a_brk){
+		let s=simpler_cmp(a[a_cnt]);
+		
+		if( (s.length==0 && a_cnt==a.length-1) ||
+			  (s.length==1 && s[0]===a[a_cnt] && a_cnt==a.length-1) ||
+			  (a_cnt > a.length-1)  
+			){
+				a_brk=true;
+			}else if(s.length > 0 ){
+				s.forEach((n)=>{a.push(n);});
+			}
+		a_cnt++;
+	}
+	a=Array.from(new Set(a)); //remove duplicates
+	ch_comp2[k]=[];
+	ch_comp2[k][0]=ch_comp[k][0];
+	ch_comp2[k][1]=ch_comp[k][1];
+	smp_components[k]=[];
+	
+	a.forEach((c)=>{
+		ch_comp2[k].push(c);
+		smp_components[k].push(c);
+	});
+}else{
+	ch_comp2[k]=[];
+	ch_comp2[k][0]=ch_comp[k][0];
+	ch_comp2[k][1]=ch_comp[k][1];
+	ch_comp2[k][2]=ch_comp[k][1];
+	smp_components[k]=[];
+}
+if(k%100==0 && k!=0){
+	console.clear();
+}
+	console.log(k);
+
+      resolve();
+    }, 0));
+  }
+})();*/
+
+console.log(ch_comp2);
+//console.log(smp_components);
+
+/*
+for(let k=0; len_k=ch_comp.length, k<len_k; k++){
+var a=[];
+if(ch_comp[k].length>=2){
+	for(let i=1; len_i=ch_comp[k].length, i<len_i; i++){
+		a.push(ch_comp[k][i]);
+	}
+
+
+	var a_brk=false;
+	var a_cnt=0;
+	
+	while(!a_brk){
+		let s=simpler_cmp(a[a_cnt]);
+		
+		if( (s.length==0 && a_cnt==a.length-1) ||
+			  (s.length==1 && s[0]===a[a_cnt] && a_cnt==a.length-1) ||
+			  (a_cnt > a.length-1)  
+			){
+				a_brk=true;
+			}else if(s.length > 0 ){
+				s.forEach((n)=>{a.push(n);});
+			}
+		a_cnt++;
+	}
+	a=Array.from(new Set(a)); //remove duplicates
+	ch_comp2[k]=[];
+	ch_comp2[k][0]=ch_comp[k][0];
+	ch_comp2[k][1]=ch_comp[k][1];
+	smp_components[k]=[];
+	
+	a.forEach((c)=>{
+		ch_comp2[k].push(c);
+		smp_components[k].push(c);
+	});
+}else{
+	ch_comp2[k]=[];
+	ch_comp2[k][0]=ch_comp[k][0];
+	ch_comp2[k][1]=ch_comp[k][1];
+	ch_comp2[k][2]=ch_comp[k][1];
+	smp_components[k]=[];
+}
+
+}
+
+console.log(ch_comp2);
+console.log(smp_components);*/
+
+/*
+//get [code point, component]: 
+var smp_components_uq=[];
+var smp_components_uq_unic=[];
+
+for(let k=0; len_k=ch_comp2.length, k<len_k; k++){
+	for(let i=2; len_i=ch_comp2[k].length, i<len_i; i++){
+		let c=ch_comp2[k][i];
+		if(!smp_components_uq.includes(c) && (len_i<=3 || (c !== ch_comp2[k][1]) ) ){
+			smp_components_uq.push(c);
+		}
+	}
+}
+
+
+for(let k=0; len_k=smp_components_uq.length, k<len_k; k++){
+let c=smp_components_uq[k];
+smp_components_uq_unic[k]=[("U+"+c.codePointAt(0).toString(16)).toLocaleUpperCase(),c];
+}
+
+console.log(smp_components_uq_unic);
+
+*/
+/*var smp_components_uq_unic_sc=[];
+
+for(let k=0; len_k= smp_components_uq.length, k<len_k; k++){
+	let s=sc.filter((c)=>{return c[0]=== smp_components_uq[k][0]});
+	let n=(s.length>0)?s[0][1]:1;
+	smp_components_uq_unic_sc[k]=[ smp_components_uq[k][0],  smp_components_uq[k][1],n];
+}
+console.log(smp_components_uq_unic_sc);*/
+
+/*
+var smp_components_uq_unic_frq=[];
+var ch_comp2_flat=[];
+
+for(let k=0; len_k= ch_comp2.length, k<len_k; k++){
+for(let j=0; len_j= ch_comp2[k].length, j<len_j; j++){
+let c=ch_comp2[k][j];
+ch_comp2_flat.push(c);
+}
+}
+for(let k=0; len_k= sc.length, k<len_k; k++){
+	let s=ch_comp2_flat.filter((c)=>{return c=== sc[k][1]});
+	n=s.length;
+	smp_components_uq_unic_frq[k]=[ sc[k][0],  sc[k][1],n, sc[k][2]];
+}
+console.log(smp_components_uq_unic_frq);
+*/
+
+
+/*let smp_components_f_sc2=[];
+
+let smp_components_f_sc_byFreq=[];
+let smp_components_f_sc_bySc=[];
+
+for(let k=0; len_k= smp_components_f_sc.length, k<len_k; k++){
+for(let j=0; len_j= smp_components_f_sc[k].length, j<len_j; j++){
+	smp_components_f_sc2[k]=[smp_components_f_sc[k][0], parseInt(smp_components_f_sc[k][0].replaceAll("U+",""),16),smp_components_f_sc[k][2],smp_components_f_sc[k][3]];
+}
+}
+
+function sortByArrCols(arr, colsArr, dir){
+    arr.sort(sortFunction);
+		function sortFunction(a, b) {
+			for(let i = 0; i < arr.length; i++){
+					if(a[colsArr[i]]>b[colsArr[i]]){
+						return dir[i]*-1;
+					}else if(a[colsArr[i]]<b[colsArr[i]]){
+						return dir[i]*1;
+					}else if(i==arr.length-1){
+					return 0;
+				}
+			} 
+	}
+}
+
+smp_components_f_sc_byFreq=smp_components_f_sc2;
+sortByArrCols(smp_components_f_sc_byFreq,[2,3,1],[1,-1,-1]);
+
+smp_components_f_sc_bySc=smp_components_f_sc2;
+sortByArrCols(smp_components_f_sc_bySc, [3,2,1],[-1,1,-1]);*/
+
+
+</script>
+</body>
+
+</html>
