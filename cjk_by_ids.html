@@ -1,0 +1,105 @@
+<html>
+
+<head>
+<meta charset="UTF-8">
+<script src="cjk_by_ids.js"></script>
+<style>
+section#txt {
+    display: -webkit-inline-box;
+}
+section#components{
+font-family: SimSun;
+width: 50%;
+}
+section#chars {
+    font-family: SimSun;
+    width: 49%;
+    margin-left: 1%;
+}
+section#chars > blockquote , a{
+margin-block-start: 3px;
+    margin-block-end: 4px;
+    margin-inline-start: 5px;
+    margin-inline-end: 0;
+    background: white;
+    width: max-content;
+    display: inline-flex;
+    font-size: 4ch;
+}
+
+section#chars > blockquote.rad{
+    background: red !important;
+}
+h1{
+text-align: center;
+}
+</style>
+<title>CJK By IDS</title>
+</head>
+	
+<body>
+<h1>CJK By IDS</h1>
+<select id="order" style="background-color: buttonface;" title="Sort by"></select><br>
+<section id="txt">
+<section id="components" style="background-color: buttonface;"></section>
+<section id="chars" style="background-color: buttonface;"></section>
+</section>
+<br>
+<button id="ld" style="background-color: buttonface;">Load 500 more</button><br>
+<script>
+var load=500;
+let srt=["Sort by frequency", "Sort by stroke count"];
+var slc=document.getElementById("order");
+var cmp=document.getElementById("components");
+var chs=document.getElementById("chars");
+var loader=document.getElementById("ld");
+srt.forEach(s => {
+    let option = document.createElement('option');
+    option.textContent = s;
+    slc.appendChild(option);	
+});
+function drawChars(){
+let arr=(slc.selectedIndex==0)?smp_components_byFreq:smp_components_bySc;
+cmp.innerText='';
+	for(let i=0; i<load; i++){
+	let lk=document.createElement('a');
+	lk.title=arr[i][0];
+	lk.onclick=()=>{
+	chars.innerHTML='';
+		let t=String.fromCodePoint(lk.title);
+		let r=document.createElement('blockquote');
+		r.className='rad';
+		r.innerText=t;
+		r.title=lk.title;
+				chars.appendChild(r);
+				chars.innerHTML+='<br>';
+		let c=ch_comp2.filter((h)=>{return h.includes(t)});
+		c.forEach((h, index)=>{
+			(async () => {
+				await new Promise(resolve => setTimeout(() => {
+					chars.innerHTML+='<blockquote title="'+h[0]+'">'+h[1]+'</blockquote>';
+					resolve();
+				}, 0));
+			})();
+
+		});
+		chars.scrollIntoView();
+	}
+	lk.innerText=String.fromCodePoint(arr[i][0]);
+		cmp.appendChild(lk);
+	}
+}
+
+loader.onclick=()=>{
+load+=500;
+drawChars();
+}
+
+slc.oninput=()=>{
+drawChars();
+}
+drawChars();
+</script>
+</body>
+
+</html>
