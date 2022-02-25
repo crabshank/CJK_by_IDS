@@ -39,8 +39,9 @@ text-align: center;
 	
 <body>
 <h1>CJK By IDS</h1>
-<select id="order" style="background-color: buttonface;" title="Sort by"></select><br>
-<section id="txt">
+<select id="order" style="background-color: buttonface;" title="Sort by"></select>
+<button id="clear_er" style="background-color: buttonface;">Clear all selections</button>
+<section id="txt"><br>
 <section id="components" style="background-color: buttonface;"></section>
 <section id="chars" style="background-color: buttonface;"></section>
 </section>
@@ -50,6 +51,7 @@ let srt=["Sort by frequency", "Sort by stroke count"];
 var slc=document.getElementById("order");
 var cmp=document.getElementById("components");
 var chs=document.getElementById("chars");
+var clr=document.getElementById("clear_er");
 var fond=[];
 var fond_i=0;
 var wInterval;
@@ -106,8 +108,6 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 }
 
 function drawChars(rd){
-
-
 				var incl=[];
 				rd.forEach((d)=>{
 					let t=String.fromCodePoint(d.getAttribute("Hex"));
@@ -137,15 +137,24 @@ wInterval = setInterval(writeFound,0);
 				chars.scrollIntoView();
 }
 
-slc.oninput=()=>{
+function clearAll(){
 stopWriteFound();
 	chars.innerHTML='';
 	let rd=[...cmp.querySelectorAll('a.rad')];	
 	if(rd.length>0){
 		rd.forEach((d)=>{
-						r.className='';
+			d.className='';
 		});
 	}
+}
+
+clr.onclick=()=>{
+	clearAll();
+}
+
+slc.oninput=()=>{
+	clearAll();
+	drawCmp();
 }
 drawCmp();
 </script>
