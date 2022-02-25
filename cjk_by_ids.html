@@ -147,12 +147,14 @@ function drawChars(rd){
 				//let lrct2=lk.getBoundingClientRect();
 		}else{
 			chars.appendChild(r);
+
 		}
 
 					r.className='rad';
 					r.title=d.getAttribute("Hex");
-
+					
 				});
+					
 				chars.innerHTML+='<br>';
 				
 				let c=ch_comp2.filter((h)=>{
@@ -185,6 +187,23 @@ stopWriteFound();
 
 clr.onclick=()=>{
 	clearAll();
+}
+
+chars.onclick=(e)=>{
+let trg=null;
+	if(e.target.tagName=="svg" && e.target.parentElement.className=="rad") {
+				trg=e.target.parentElement;
+		}else if( (e.target.tagName=="blockquote" && e.target.className=="rad") ){
+				trg=e.target;
+		}
+		
+	if(!!trg){
+		let rd=[...cmp.querySelectorAll('a.rad')];
+		let k=rd.filter((l)=>{return trg.title==l.getAttribute("Hex");});
+		if(k.length>0){
+			k[0].scrollIntoView();
+		}		
+	}
 }
 
 slc.oninput=()=>{
