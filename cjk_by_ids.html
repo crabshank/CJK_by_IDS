@@ -27,7 +27,7 @@ margin-block-start: 3px;
     font-size: 4ch;
 }
 
-section#chars > blockquote.rad{
+section#chars > blockquote.rad, section#components > a.rad{
     background: red !important;
 }
 h1{
@@ -45,60 +45,107 @@ text-align: center;
 <section id="chars" style="background-color: buttonface;"></section>
 </section>
 <br>
-<button id="ld" style="background-color: buttonface;">Load 500 more</button><br>
 <script>
-var load=500;
 let srt=["Sort by frequency", "Sort by stroke count"];
 var slc=document.getElementById("order");
 var cmp=document.getElementById("components");
 var chs=document.getElementById("chars");
-var loader=document.getElementById("ld");
+var fond=[];
+var fond_i=0;
+var wInterval;
+
+function writeFound() {
+	try{
+		chars.innerHTML+='<blockquote title="'+fond[fond_i][0]+'">'+fond[fond_i][1]+'</blockquote>';
+		fond_i++;
+	}catch(e){;}
+
+}
+function stopWriteFound() {
+  clearInterval(wInterval);
+}
+
 srt.forEach(s => {
     let option = document.createElement('option');
     option.textContent = s;
     slc.appendChild(option);	
 });
-function drawChars(){
-let arr=(slc.selectedIndex==0)?smp_components_byFreq:smp_components_bySc;
-cmp.innerText='';
-	for(let i=0; i<load; i++){
-	let lk=document.createElement('a');
-	lk.title=arr[i][0];
-	lk.onclick=()=>{
-	chars.innerHTML='';
-		let t=String.fromCodePoint(lk.title);
-		let r=document.createElement('blockquote');
-		r.className='rad';
-		r.innerText=t;
-		r.title=lk.title;
-				chars.appendChild(r);
-				chars.innerHTML+='<br>';
-		let c=ch_comp2.filter((h)=>{return h.includes(t)});
-		c.forEach((h, index)=>{
-			(async () => {
-				await new Promise(resolve => setTimeout(() => {
-					chars.innerHTML+='<blockquote title="'+h[0]+'">'+h[1]+'</blockquote>';
-					resolve();
-				}, 0));
-			})();
 
-		});
-		chars.scrollIntoView();
-	}
-	lk.innerText=String.fromCodePoint(arr[i][0]);
+function drawCmp(){
+let arr=(slc.selectedIndex==0)?smp_components_byFreq:smp_components_bySc;
+cmp.innerHTML='';
+for(let i=0; len_i=arr.length, i<len_i; i++){
+		let lk=document.createElement('a');
+		lk.setAttribute("Hex",arr[i][0]);
+		lk.title=arr[i][0]+' (Stroke count: '+arr[i][3]+')';
+		
+		lk.innerText=String.fromCodePoint(arr[i][0]);
 		cmp.appendChild(lk);
+
 	}
+	
+	let lnk=[...cmp.getElementsByTagName('a')];
+	lnk.forEach((lk)=>{
+			lk.onclick=()=>{
+			stopWriteFound();
+			if(lk.className==='rad'){
+				lk.className='';
+			}else{
+				lk.className='rad';
+			}
+			let rd=[...cmp.querySelectorAll('a.rad')];
+			
+			chars.innerHTML='';
+			if(rd.length>0){
+				drawChars(rd);
+			}
+		};
+});
 }
 
-loader.onclick=()=>{
-load+=500;
-drawChars();
+function drawChars(rd){
+
+
+				var incl=[];
+				rd.forEach((d)=>{
+					let t=String.fromCodePoint(d.getAttribute("Hex"));
+					incl.push(t);
+					let r=document.createElement('blockquote');
+					r.className='rad';
+					r.innerText=t;
+					r.title=d.getAttribute("Hex");
+					chars.appendChild(r);
+				});
+				chars.innerHTML+='<br>';
+				
+				let c=ch_comp2.filter((h)=>{
+					let fnd=true;
+					for(let k=0; len_k=incl.length, k<len_k; k++){
+						if(!h.includes(incl[k])){
+							fnd=false;
+							k=len_k-1;
+						}
+					}
+					return fnd;
+				});
+				
+				fond=c;
+fond_i=0;
+wInterval = setInterval(writeFound,0);
+				chars.scrollIntoView();
 }
 
 slc.oninput=()=>{
-drawChars();
+stopWriteFound();
+	chars.innerHTML='';
+	let rd=[...cmp.querySelectorAll('a.rad')];	
+	if(rd.length>0){
+		rd.forEach((d)=>{
+						r.className='';
+		});
+	}
 }
-drawChars();
+drawCmp();
 </script>
 </body>
 
