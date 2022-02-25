@@ -82,9 +82,24 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 		let lk=document.createElement('a');
 		lk.setAttribute("Hex",arr[i][0]);
 		lk.title=arr[i][0]+' (Stroke count: '+arr[i][3]+')';
-		
+		let ud=svgs.filter((s)=>{return s[0]==arr[i][0];});
 		lk.innerText=String.fromCodePoint(arr[i][0]);
+		if(ud.length>0){
 		cmp.appendChild(lk);
+		let lrct=lk.getBoundingClientRect();
+		let w=lrct.width;
+		let h=lrct.width;
+				lk.innerHTML='<svg><g><path style=" transform: scale(0.015); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg>';
+				let v=[...lk.children][0];
+				v.style.width=w;
+				v.style.height=h;
+				v.style.transform="scaleY(-1)";
+				v.style.transformOrigin="center";
+				//let lrct2=lk.getBoundingClientRect();
+		}else{
+			cmp.appendChild(lk);
+		}
+		
 
 	}
 	
@@ -110,13 +125,33 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 function drawChars(rd){
 				var incl=[];
 				rd.forEach((d)=>{
-					let t=String.fromCodePoint(d.getAttribute("Hex"));
-					incl.push(t);
+					
 					let r=document.createElement('blockquote');
-					r.className='rad';
+					
+		let t=String.fromCodePoint(d.getAttribute("Hex"));			
+		let ud=svgs.filter((s)=>{return s[0]==d.getAttribute("Hex");});
+		
+					incl.push(t);
 					r.innerText=t;
+		if(ud.length>0){
+		chars.appendChild(r);
+		let lrct=r.getBoundingClientRect();
+		let w=lrct.width;
+		let h=lrct.width;
+				r.innerHTML='<svg><g><path style=" transform: scale(0.015); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg>';
+				let v=[...r.children][0];
+				v.style.width=w;
+				v.style.height=h;
+				v.style.transform="scaleY(-1)";
+				v.style.transformOrigin="center";
+				//let lrct2=lk.getBoundingClientRect();
+		}else{
+			chars.appendChild(r);
+		}
+
+					r.className='rad';
 					r.title=d.getAttribute("Hex");
-					chars.appendChild(r);
+
 				});
 				chars.innerHTML+='<br>';
 				
