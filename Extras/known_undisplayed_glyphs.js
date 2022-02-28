@@ -1,14 +1,13 @@
+/* TO REGENERATE AFTER ADDDING SVG PATHS:
+let v=svgs.map(s=>{return s[0]}); let k=known_undisplayed_glyphs.filter((g)=>{return !v.includes(g);}); console.log(k);
+*/
+
 const known_undisplayed_glyphs=[
-    "0x2C6F8",
     "0x2C5CC",
-    "0x2CD18",
-    "0x2F816",
     "0x2E27C",
     "0x2D063",
     "0x2D96D",
-    "0x2DB80",
     "0x2E204",
-    "0x2F91B",
     "0x2BC93",
     "0x2D0CC",
     "0x2D0E1",
@@ -42,7 +41,6 @@ const known_undisplayed_glyphs=[
     "0x2DEB1",
     "0x2E5DF",
     "0x2E815",
-    "0x2F941",
     "0x2BD5A",
     "0x2D399",
     "0x2D422",
@@ -53,7 +51,6 @@ const known_undisplayed_glyphs=[
     "0x2DF3F",
     "0x2E270",
     "0x2E816",
-    "0x2F861",
     "0x2BE1A",
     "0x2BF0B",
     "0x2C0A7",
@@ -85,7 +82,6 @@ const known_undisplayed_glyphs=[
     "0x2DB67",
     "0x2DD3A",
     "0x2E979",
-    "0x2F8F7",
     "0x2BCE4",
     "0x2CFEB",
     "0x2D416",
@@ -125,6 +121,5 @@ const known_undisplayed_glyphs=[
     "0x2D433",
     "0x2CED8",
     "0x2D021",
-    "0x2CEFC",
-    "0x2F9DD"
+    "0x2CEFC"
 ];
