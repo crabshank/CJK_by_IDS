@@ -190,10 +190,13 @@ clr.onclick=()=>{
 }
 
 chars.onclick=(e)=>{
-let trg=null;
-	if(e.target.tagName=="svg" && e.target.parentElement.className=="rad") {
-				trg=e.target.parentElement;
-		}else if( (e.target.tagName=="blockquote" && e.target.className=="rad") ){
+var trg=null;
+	if((e.target.tagName=="svg" || e.target.tagName=="g" || e.target.tagName=="path") && e.target.parentElement.className=="rad") {
+				trg=e.target;
+				while (trg.tagName!="BLOCKQUOTE" && trg.tagName!="HTML"){
+					trg=e.target.parentElement;
+				}
+		}else if( (e.target.tagName=="BLOCKQUOTE" && e.target.className=="rad") ){
 				trg=e.target;
 		}
 		
