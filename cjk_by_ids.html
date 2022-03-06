@@ -16,19 +16,29 @@ section#chars {
     width: 49%;
     margin-left: 1%;
 }
+
 section#chars > blockquote , a{
 margin-block-start: 3px;
     margin-block-end: 4px;
-    margin-inline-start: 5px;
-    margin-inline-end: 0;
+    margin-inline-start: 4px;
+    margin-inline-end: 1px;
     background: white;
     width: max-content;
-    display: inline-flex;
     font-size: 4ch;
 }
-
-section#chars > blockquote.rad, section#components > a.rad{
+section#chars > blockquote.char,  section#components > a.cmp{
+    display: inline-flex !important;
+}
+section#components > a.cmp_svg{
+    display: inline !important;
+}
+section#components > a.rad, section#chars > blockquote.rad{
     background: red !important;
+    display: inline-flex !important;
+}
+section#components > a.rad_svg, section#chars > blockquote.rad_svg{
+    background: red !important;
+    display: inline !important;
 }
 h1{
 text-align: center;
@@ -58,7 +68,7 @@ var wInterval;
 
 function writeFound() {
 	try{
-		chars.innerHTML+='<blockquote title="'+fond[fond_i][0]+'">'+fond[fond_i][1]+'</blockquote>';
+		chars.innerHTML+='<blockquote class="char" title="'+fond[fond_i][0]+'">'+fond[fond_i][1]+'</blockquote>';
 		fond_i++;
 	}catch(e){;}
 
@@ -83,27 +93,33 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 		lk.setAttribute("Hex",arr[i][0]);
 		lk.title=arr[i][0]+' (Stroke count: '+arr[i][3]+')';
 		let ud=svgs.filter((s)=>{return s[0]==arr[i][0];});
-		lk.innerHTML=String.fromCodePoint(arr[i][0]);
+		let t=String.fromCodePoint(arr[i][0]);
+		lk.innerHTML=t;
 		if(ud.length>0){
 		cmp.appendChild(lk);
 		let lrct=lk.getBoundingClientRect();
 		let w=lrct.width;
 		let h=lrct.width;
 		let b=lrct.bottom;
-				lk.innerHTML='<svg><g><path style=" transform: scale(0.015); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg>';
-				let v=[...lk.children][0];
-				v.style.width=w;
-				v.style.height=h;
+				lk.innerHTML='<div style="padding: 0px !important; border-bottom-width: 0px !important; border-left-width: 0px !important; border-right-width: 0px !important; border-top-width: 0px!important; margin-block-start: 3px!important; margin-block-end: 4px!important; max-width: max-content !important; display: inline-grid !important;">'+t+'<svg style="user-select: none !important;"><g><path style=" transform: scale(0.015); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg></div>';
+					let v=[...lk.children][0].children[0];
+					v.style.width=w;
+					v.style.height=h;
+					let svg_rct=v.getBoundingClientRect();
 				lrct=lk.getBoundingClientRect();
 				lk.style.transform="translateY("+(b-lrct.bottom)+"px)"
-				v.style.transform="scaleY(-1)";
+				v.style.transform="scaleY(-1) translateY("+(svg_rct.top-lrct.top)+"px)";
 				v.style.transformOrigin="center";
 				//let lrct2=lk.getBoundingClientRect();
+				v=[...lk.children][0];
+					v.style.width=w;
+					v.style.height=h;
+					//let div_rct=v.getBoundingClientRect();
+				lk.className='cmp_svg';
 		}else{
 			cmp.appendChild(lk);
+			lk.className='cmp';
 		}
-		
-
 	}
 	
 	let lnk=[...cmp.getElementsByTagName('a')];
@@ -111,11 +127,15 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 			lk.onclick=()=>{
 			stopWriteFound();
 			if(lk.className==='rad'){
-				lk.className='';
-			}else{
+				lk.className='cmp';
+			}else if(lk.className==='rad_svg'){
+				lk.className='cmp_svg';
+			}else if(lk.className==='cmp_svg'){
+				lk.className='rad_svg';
+			}else if(lk.className==='cmp'){
 				lk.className='rad';
 			}
-			let rd=[...cmp.querySelectorAll('a.rad')];
+			let rd=[...cmp.querySelectorAll('a.rad'), ...cmp.querySelectorAll('a.rad_svg')];
 			
 			chars.innerHTML='';
 			if(rd.length>0){
@@ -141,19 +161,24 @@ function drawChars(rd){
 		let lrct=r.getBoundingClientRect();
 		let w=lrct.width;
 		let h=lrct.width;
-				r.innerHTML='<svg><g><path style=" transform: scale(0.015); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg>';
-				let v=[...r.children][0];
-				v.style.width=w;
-				v.style.height=h;
-				v.style.transform="scaleY(-1)";
-				v.style.transformOrigin="center";
-				//let lrct2=lk.getBoundingClientRect();
+				r.innerHTML='<div style="padding: 0px !important; border-bottom-width: 0px !important; border-left-width: 0px !important; border-right-width: 0px !important; border-top-width: 0px!important; margin-block-start: 3px!important; margin-block-end: 4px!important; max-width: max-content !important; display: inline-grid !important;">'+t+'<svg style="user-select: none !important;"><g><path style=" transform: scale(0.015); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg></div>';
+					let v=[...r.children][0].children[0];
+					v.style.width=w;
+					v.style.height=h;
+					let svg_rct=v.getBoundingClientRect();
+					v.style.transform="scaleY(-1) translateY("+(svg_rct.top-lrct.top)+"px)";
+					v.style.transformOrigin="center";
+					//let lrct2=lk.getBoundingClientRect();
+					v=[...r.children][0];
+					v.style.width=w;
+					v.style.height=h;
+					let div_rct=v.getBoundingClientRect();
+					v.style.transform="translateY("+(div_rct.top-lrct.top)+"px)";
+					r.className='rad_svg';
 		}else{
-			chars.appendChild(r);
-
-		}
-
-					r.className='rad';
+			chars.appendChild(r);	
+			r.className='rad';
+		}	
 					r.title=d.getAttribute("Hex");
 					
 				});
@@ -194,17 +219,17 @@ clr.onclick=()=>{
 
 chars.onclick=(e)=>{
 var trg=null;
-	if((e.target.tagName=="svg" || e.target.tagName=="g" || e.target.tagName=="path") && e.target.parentElement.className=="rad") {
+	if(e.target.tagName=="div" || e.target.tagName=="svg" || e.target.tagName=="g" || e.target.tagName=="path") {
 				trg=e.target;
-				while (trg.tagName!="BLOCKQUOTE" && trg.tagName!="HTML"){
-					trg=e.target.parentElement;
+				while ((trg.tagName!="BLOCKQUOTE" && !(trg.className=="rad" || trg.className=="rad_svg") ) && trg.tagName!="HTML"){
+					trg=trg.parentElement;
 				}
-		}else if( (e.target.tagName=="BLOCKQUOTE" && e.target.className=="rad") ){
+		}else if(e.target.tagName=="BLOCKQUOTE" && (e.target.className=="rad" || e.target.className=="rad_svg") ){
 				trg=e.target;
 		}
 		
 	if(!!trg){
-		let rd=[...cmp.querySelectorAll('a.rad')];
+		let rd=[...cmp.querySelectorAll('a.rad'), ...cmp.querySelectorAll('a.rad_svg')];
 		let k=rd.filter((l)=>{return trg.title==l.getAttribute("Hex");});
 		if(k.length>0){
 			k[0].scrollIntoView();
