@@ -65,6 +65,11 @@ var clr=document.getElementById("clear_er");
 var fond=[];
 var fond_i=0;
 var wInterval;
+var svg_scl=0.75;
+
+function getClientBoundingMiddles(r){
+	return {v: 0.5*(r.bottom-r.top)+r.top, h: 0.5*(r.right-r.left)+r.left};
+}
 
 function writeFound() {
 	try{
@@ -105,16 +110,21 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 					let v=[...lk.children][0].children[0];
 					v.style.width=w;
 					v.style.height=h;
-					let svg_rct=v.getBoundingClientRect();
 				lrct=lk.getBoundingClientRect();
 				lk.style.transform="translateY("+(b-lrct.bottom)+"px)"
-				v.style.transform="scaleY(-1) translateY("+(svg_rct.top-lrct.top)+"px)";
+				v.style.transform="scaleY(-1)";
 				v.style.transformOrigin="center";
-				//let lrct2=lk.getBoundingClientRect();
-				v=[...lk.children][0];
-					v.style.width=w;
-					v.style.height=h;
-					//let div_rct=v.getBoundingClientRect();
+				let dv=[...lk.children][0];
+					dv.style.width=w;
+					dv.style.height=h;
+				let s=[...v.getElementsByTagName('path')][0];
+				let svg_rct=s.getBoundingClientRect();
+				let m=Math.max(svg_rct.width,svg_rct.height);
+				let m2=Math.max(w,h);
+				let scl=(m2/m)*svg_scl;
+				let l_m=getClientBoundingMiddles(lrct);
+				let s_m=getClientBoundingMiddles(svg_rct);
+				dv.style.transform="scale("+scl+") translate("+(l_m.h-s_m.h)+"px, "+(l_m.v-s_m.v)+"px)";
 				lk.className='cmp_svg';
 		}else{
 			cmp.appendChild(lk);
@@ -161,19 +171,25 @@ function drawChars(rd){
 		let lrct=r.getBoundingClientRect();
 		let w=lrct.width;
 		let h=lrct.width;
+		let b=lrct.bottom;
 				r.innerHTML='<div style="padding: 0px !important; border-bottom-width: 0px !important; border-left-width: 0px !important; border-right-width: 0px !important; border-top-width: 0px!important; margin-block-start: 3px!important; margin-block-end: 4px!important; max-width: max-content !important; display: inline-grid !important;">'+t+'<svg style="user-select: none !important;"><g><path style=" transform: scale(0.015); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg></div>';
 					let v=[...r.children][0].children[0];
 					v.style.width=w;
 					v.style.height=h;
-					let svg_rct=v.getBoundingClientRect();
+				let svg_rct=v.getBoundingClientRect();
 					v.style.transform="scaleY(-1) translateY("+(svg_rct.top-lrct.top)+"px)";
 					v.style.transformOrigin="center";
-					//let lrct2=lk.getBoundingClientRect();
-					v=[...r.children][0];
-					v.style.width=w;
-					v.style.height=h;
-					let div_rct=v.getBoundingClientRect();
-					v.style.transform="translateY("+(div_rct.top-lrct.top)+"px)";
+				let dv=[...r.children][0];
+					dv.style.width=w;
+					dv.style.height=h;
+				let s=[...v.getElementsByTagName('path')][0];
+				 svg_rct=s.getBoundingClientRect();
+				let m=Math.max(svg_rct.width,svg_rct.height);
+				let m2=Math.max(w,h);
+				let scl=(m2/m)*svg_scl;
+				let l_m=getClientBoundingMiddles(lrct);
+				let s_m=getClientBoundingMiddles(svg_rct);
+				dv.style.transform="scale("+scl+") translate("+(l_m.h-s_m.h)+"px, "+(l_m.v-s_m.v)+"px)";
 					r.className='rad_svg';
 		}else{
 			chars.appendChild(r);	
