@@ -1,3 +1,21 @@
+/* TO GET PATHS FROM SVG:
+let glyphs=[...document.getElementsByTagName('glyph')];
+function getGlyphsSvg(){
+	var arr=[];
+	for (let i=0, len=glyphs.length; i<len; i++){
+		let u=glyphs[i].getAttribute('glyph-name');
+		if(u.startsWith('uni')){
+			arr.push(['0x'+u.substring(3),glyphs[i].getAttribute('d')]);
+		}else if(u.startsWith('u')){
+			arr.push(['0x'+u.substring(1),glyphs[i].getAttribute('d')]);
+		} 
+	}
+	return arr;
+}
+let glyphsSvg=getGlyphsSvg();
+let glyphsSvgUnk=glyphsSvg.filter((g)=>{return known_undisplayed_glyphs.includes(g[0]);});
+*/
+
 /* TO REGENERATE AFTER ADDDING SVG PATHS:
 let v=svgs.map(s=>{return s[0]}); let k=known_undisplayed_glyphs.filter((g)=>{return !v.includes(g);}); console.log(k);
 */
