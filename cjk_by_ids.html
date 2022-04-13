@@ -67,6 +67,50 @@ var fond_i=0;
 var wInterval;
 var svg_scl=0.75;
 
+function absBoundingClientRect(el){
+	let st = [window?.scrollY,
+					window?.pageYOffset,
+					el?.ownerDocument?.documentElement?.scrollTop,
+					document?.documentElement?.scrollTop,
+					document?.body?.parentNode?.scrollTop,
+					document?.body?.scrollTop,
+					document?.head?.scrollTop];
+					
+		let sl = [window?.scrollX,
+						window?.pageXOffset,
+						el?.ownerDocument?.documentElement?.scrollLeft,
+						document?.documentElement?.scrollLeft,
+						document?.body?.parentNode?.scrollLeft,
+						document?.body?.scrollLeft,
+						document?.head?.scrollLeft];
+						
+				let scrollTop=0;
+				for(let k=0; k<st.length; k++){
+					if(!!st[k] && typeof  st[k] !=='undefined' && st[k]>0){
+						scrollTop=(st[k]>scrollTop)?st[k]:scrollTop;
+					}
+				}			
+
+				let scrollLeft=0;
+				for(let k=0; k<sl.length; k++){
+					if(!!sl[k] && typeof  sl[k] !=='undefined' && sl[k]>0){
+						scrollLeft=(sl[k]>scrollLeft)?sl[k]:scrollLeft;
+					}
+				}
+	
+	const rct=el.getBoundingClientRect();
+	let r={};
+
+	r.left=rct.left+scrollLeft;
+	r.right=rct.right+scrollLeft;
+	r.top=rct.top+scrollTop;
+	r.bottom=rct.bottom+scrollTop;
+	r.height=rct.height;
+	r.width=rct.width;
+	
+	return r;
+}
+
 function getClientBoundingMiddles(r){
 	return {v: 0.5*r.height+r.top, h: 0.5*r.width+r.left};
 }
@@ -102,15 +146,15 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 		lk.innerHTML=t;
 		if(ud.length>0){
 		cmp.appendChild(lk);
-		let lrct=lk.getBoundingClientRect();
+		let lrct=absBoundingClientRect(lk);
 		let w=lrct.width;
 		let h=lrct.width;
 		let b=lrct.bottom;
-				lk.innerHTML='<div style="color: transparent !important; pointer-events: none !important; padding: 0px !important; border-bottom-width: 0px !important; border-left-width: 0px !important; border-right-width: 0px !important; border-top-width: 0px!important; margin-block-start: 3px!important; margin-block-end: 4px!important; max-width: max-content !important; display: inline-grid !important;">'+t+'<svg style="pointer-events: none !important; user-select: none !important;"><g style="pointer-events: none !important; "><path style="pointer-events: none !important; transform: scale(0.015); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg></div>';
+				lk.innerHTML='<div style="color: transparent !important; pointer-events: none !important; padding: 0px !important; border-bottom-width: 0px !important; border-left-width: 0px !important; border-right-width: 0px !important; border-top-width: 0px!important; margin-block-start: 3px!important; margin-block-end: 4px!important; max-width: max-content !important; display: inline-grid !important;">'+t+'<svg style="pointer-events: none !important; user-select: none !important;"><g style="pointer-events: none !important; "><path style="pointer-events: none !important; transform: scale(0.01); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg></div>';
 					let v=[...lk.children][0].children[0];
 					v.style.width=w;
 					v.style.height=h;
-				lrct=lk.getBoundingClientRect();
+				lrct=absBoundingClientRect(lk);
 				lk.style.transform="translateY("+(b-lrct.bottom)+"px)"
 				v.style.transform="scaleY(-1)";
 				v.style.transformOrigin="center";
@@ -118,13 +162,14 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 					dv.style.width=w;
 					dv.style.height=h;
 				let s=[...v.getElementsByTagName('path')][0];
-				let svg_rct=s.getBoundingClientRect();
+				let svg_rct=absBoundingClientRect(s);
 				let m=Math.max(svg_rct.width,svg_rct.height);
 				let m2=Math.max(w,h);
 				let scl=(m2/m)*svg_scl;
 				let l_m=getClientBoundingMiddles(lrct);
 				let s_m=getClientBoundingMiddles(svg_rct);
 				dv.style.transform="scale("+scl+") translate("+(l_m.h-s_m.h)+"px, "+(l_m.v-s_m.v)+"px)";
+				dv.style.verticalAlign='text-bottom';
 				lk.className='cmp_svg';
 		}else{
 			cmp.appendChild(lk);
@@ -168,22 +213,22 @@ function drawChars(rd){
 					r.innerHTML=t;
 		if(ud.length>0){
 		chars.appendChild(r);
-		let lrct=r.getBoundingClientRect();
+		let lrct=absBoundingClientRect(r);
 		let w=lrct.width;
 		let h=lrct.width;
 		let b=lrct.bottom;
-				r.innerHTML='<div style="color: transparent !important; pointer-events: none !important; padding: 0px !important; border-bottom-width: 0px !important; border-left-width: 0px !important; border-right-width: 0px !important; border-top-width: 0px!important; margin-block-start: 3px!important; margin-block-end: 4px!important; max-width: max-content !important; display: inline-grid !important;">'+t+'<svg style="pointer-events: none !important; user-select: none !important;"><g style="pointer-events: none !important;"><path style="pointer-events: none !important; transform: scale(0.015); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg></div>';
+				r.innerHTML='<div style="color: transparent !important; pointer-events: none !important; padding: 0px !important; border-bottom-width: 0px !important; border-left-width: 0px !important; border-right-width: 0px !important; border-top-width: 0px!important; margin-block-start: 3px!important; margin-block-end: 4px!important; max-width: max-content !important; display: inline-grid !important; vertical-align: top !important;">'+t+'<svg style="pointer-events: none !important; user-select: none !important;"><g style="pointer-events: none !important;"><path style="pointer-events: none !important; transform: scale(0.01); transform-origin: left center"; d="'+ud[0][1]+ '"/></g></svg></div>';
 					let v=[...r.children][0].children[0];
 					v.style.width=w;
 					v.style.height=h;
-				let svg_rct=v.getBoundingClientRect();
+				let svg_rct=absBoundingClientRect(v);
 					v.style.transform="scaleY(-1) translateY("+(svg_rct.top-lrct.top)+"px)";
 					v.style.transformOrigin="center";
 				let dv=[...r.children][0];
 					dv.style.width=w;
 					dv.style.height=h;
 				let s=[...v.getElementsByTagName('path')][0];
-				 svg_rct=s.getBoundingClientRect();
+				 svg_rct=absBoundingClientRect(s);
 				let m=Math.max(svg_rct.width,svg_rct.height);
 				let m2=Math.max(w,h);
 				let scl=(m2/m)*svg_scl;
