@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script src="cjk_by_ids.js"></script>
+<script src="Unihan_Readings.js"></script>
 <style>
 section#txt {
     display: -webkit-inline-box;
@@ -26,7 +27,7 @@ margin-block-start: 3px;
     width: max-content;
     font-size: 4ch;
 }
-section#chars > blockquote.char,  section#components > a.cmp{
+section#chars > blockquote,  section#components > a.cmp{
     display: inline-flex !important;
 }
 section#components > a.cmp_svg{
@@ -40,8 +41,15 @@ section#components > a.rad_svg, section#chars > blockquote.rad_svg{
     background: red !important;
     display: inline !important;
 }
+section#chars > blockquote.sel, section.unihan_char{
+    background: green !important;
+}
+section.unihan_rad{
+    background: red !important;
+}
 h1{
-text-align: center;
+    text-align: left;
+    margin-left: 16.666666%;
 }
 </style>
 <title>CJK By IDS</title>
@@ -49,6 +57,7 @@ text-align: center;
 	
 <body>
 <h1>CJK By IDS</h1>
+<section id="sel_uni" style="position: absolute;"></section>
 <select id="order" style="background-color: buttonface;" title="Sort by"></select>
 <button id="clear_er" style="background-color: buttonface;">Clear all selections</button>
 <section id="txt"><br>
@@ -62,10 +71,20 @@ var slc=document.getElementById("order");
 var cmp=document.getElementById("components");
 var chs=document.getElementById("chars");
 var clr=document.getElementById("clear_er");
+var sl_uni=document.getElementById("sel_uni");
 var fond=[];
 var fond_i=0;
 var wInterval;
 var svg_scl=0.75;
+var lookup_unihan=unihan_readings.split('\n').map((r)=>{return r.split('\t')}).filter((r)=>{return r.length==3});
+
+function elRemover(el){
+	if(typeof el!=='undefined' && !!el){
+	if(typeof el.parentNode!=='undefined' && !!el.parentNode){
+		el.parentNode.removeChild(el);
+	}
+	}
+}
 
 function absBoundingClientRect(el){
 	let st = [window?.scrollY,
@@ -117,7 +136,38 @@ function getClientBoundingMiddles(r){
 
 function writeFound() {
 	try{
-		chars.innerHTML+='<blockquote class="char" title="'+fond[fond_i][0]+'">'+fond[fond_i][1]+'</blockquote>';
+		let b=document.createElement('blockquote');
+		b.className='char';
+		b.setAttribute('Hex',fond[fond_i][0]);
+		b.title=fond[fond_i][0];
+		b.setAttribute('sel',false);
+		b.innerText=fond[fond_i][1];
+		chars.appendChild(b);
+		b.onclick=()=>{
+		let hx=b.getAttribute('Hex');
+			if(b.getAttribute('sel')=="false"){
+				b.setAttribute('sel',true);
+				b.className='sel';
+				let h=hx.replace('0x','U+');
+				let u=lookup_unihan.filter((c)=>{return c[0]===h ;});
+				let s=document.createElement('section');
+				s.setAttribute('Hex',hx);
+				s.innerHTML='<section class="unihan_char">'+b.innerText+'</section>';
+				u.forEach((a)=>{
+					s.innerHTML+='<section>'+a[1]+': '+a[2]+'</section>';
+				});
+				s.innerHTML+='<br>';
+				sl_uni.appendChild(s);
+				sl_uni.scrollTop=s.offsetTop;
+			}else{
+				b.setAttribute('sel',false);
+				b.className='char';
+				let sc=[...sl_uni.getElementsByTagName('SECTION')].filter((s)=>{return !!s.getAttribute('Hex') && s.getAttribute('Hex')==hx;});
+				sc.forEach((s)=>{
+					elRemover(s);
+				});
+			}
+		}
 		fond_i++;
 	}catch(e){;}
 
@@ -141,6 +191,7 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 		let lk=document.createElement('a');
 		lk.setAttribute("Hex",arr[i][0]);
 		lk.title=arr[i][0]+' (Stroke count: '+arr[i][3]+')';
+		lk.setAttribute("Hex",arr[i][0]);
 		let ud=svgs.filter((s)=>{return s[0]==arr[i][0];});
 		let t=String.fromCodePoint(arr[i][0]);
 		lk.innerHTML=t;
@@ -183,8 +234,19 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 			stopWriteFound();
 			if(lk.className==='rad'){
 				lk.className='cmp';
+			let sc=[...sl_uni.getElementsByTagName('SECTION')].filter((s)=>{return !!lk.getAttribute('Hex') && lk.getAttribute('Hex')==s.getAttribute('Hex');});
+				sc.forEach((s)=>{
+					elRemover(s);
+				});
+				
 			}else if(lk.className==='rad_svg'){
 				lk.className='cmp_svg';
+				
+				let sc=[...sl_uni.getElementsByTagName('SECTION')].filter((s)=>{return !!lk.getAttribute('Hex') && lk.getAttribute('Hex')==s.getAttribute('Hex');});
+				sc.forEach((s)=>{
+					elRemover(s);
+				});
+				
 			}else if(lk.className==='cmp_svg'){
 				lk.className='rad_svg';
 			}else if(lk.className==='cmp'){
@@ -195,6 +257,11 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 			chars.innerHTML='';
 			if(rd.length>0){
 				drawChars(rd);
+			}else{
+				let sc=[...sl_uni.getElementsByTagName('SECTION')];
+				sc.forEach((s)=>{
+					elRemover(s);
+				});
 			}
 		};
 });
@@ -205,12 +272,26 @@ function drawChars(rd){
 				rd.forEach((d,index)=>{
 					
 					let r=document.createElement('blockquote');
-					
-		let t=String.fromCodePoint(d.getAttribute("Hex"));			
-		let ud=svgs.filter((s)=>{return s[0]==d.getAttribute("Hex");});
+					let hx= d.getAttribute("Hex");
+		let t=String.fromCodePoint(hx);			
+		let ud=svgs.filter((s)=>{return s[0]==hx;});
 		
 					incl.push(t);
 					r.innerHTML=t;
+					let ix=[...sl_uni.getElementsByTagName('SECTION')].findIndex((s)=>{return !!s.getAttribute('Hex') && s.getAttribute('Hex')==hx;});
+		if(ix<0){
+				let h=hx.replace('0x','U+');
+				let u=lookup_unihan.filter((c)=>{return c[0]===h ;});
+				let s=document.createElement('section');
+				s.setAttribute('Hex',hx);
+				s.innerHTML='<section class="unihan_rad">'+t+'</section>';
+				u.forEach((a)=>{
+					s.innerHTML+='<section>'+a[1]+': '+a[2]+'</section>';
+				});
+				s.innerHTML+='<br>';
+				sl_uni.appendChild(s);
+				sl_uni.scrollTop=s.offsetTop;
+			}
 		if(ud.length>0){
 		chars.appendChild(r);
 		let lrct=absBoundingClientRect(r);
@@ -236,13 +317,13 @@ function drawChars(rd){
 				let s_m=getClientBoundingMiddles(svg_rct);
 				dv.style.transform="scale("+scl+") translate("+(l_m.h-s_m.h)+"px, "+(l_m.v-s_m.v)+"px)";
 				dv.style.verticalAlign=(index==0)?'top':'bottom';
-					r.className='rad_svg';
+					r.className='rad_svg';				
 		}else{
 			chars.appendChild(r);	
 			r.className='rad';
 		}	
-					r.title=d.getAttribute("Hex");
-					
+					r.setAttribute("Hex",hx);
+					r.title=hx;
 				});
 					
 				chars.innerHTML+='<br>';
@@ -273,6 +354,11 @@ stopWriteFound();
 			d.className='';
 		});
 	}
+
+	let sc=[...sl_uni.getElementsByTagName('SECTION')];
+	sc.forEach((s)=>{
+		elRemover(s);
+	});
 }
 
 clr.onclick=()=>{
@@ -304,6 +390,42 @@ slc.oninput=()=>{
 	drawCmp();
 }
 drawCmp();
+
+function unibox_rsz(first){
+	let h1Rct=absBoundingClientRect(chs);
+	sl_uni.style.left=h1Rct.left+'px';
+	sl_uni.style.top='2px';
+	sl_uni.style.width=h1Rct.width+'px';
+	let hgt=h1Rct.top-2;
+	sl_uni.style.height=(hgt)+'px';
+	sl_uni.style.minHeight=(hgt)+'px';
+	sl_uni.style.paddingLeft='0px';
+	sl_uni.style.marginTop='0px';
+	sl_uni.style.marginBottom='0px';
+	sl_uni.style.overflowY='scroll';
+	sl_uni.style.resize='vertical';
+	if(first){
+		chs.setAttribute('top_pos',h1Rct.top);
+	}
+}
+unibox_rsz(true);
+
+const resizeObserver = new ResizeObserver(entries => {
+  for (let entry of entries) {
+  let t=parseFloat(chs.getAttribute('top_pos'));
+  let h=entry.contentRect.height;
+  if(h>t){
+	chs.style.transform="translateY("+(h-t)+"px)";
+  }
+  }
+});
+
+resizeObserver.observe(sl_uni);
+
+window.addEventListener('resize',function(e){
+unibox_rsz(false);
+});
+
 </script>
 </body>
 
