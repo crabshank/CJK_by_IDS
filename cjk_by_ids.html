@@ -152,7 +152,7 @@ function writeFound() {
 				let u=lookup_unihan.filter((c)=>{return c[0]===h ;});
 				let s=document.createElement('section');
 				s.setAttribute('Hex',hx);
-				s.innerHTML='<section class="unihan_char">'+b.innerText+'</section>';
+				s.innerHTML='<section class="unihan_char">'+b.innerText+' ('+hx+')</section>';
 				u.forEach((a)=>{
 					s.innerHTML+='<section>'+a[1]+': '+a[2]+'</section>';
 				});
@@ -166,6 +166,14 @@ function writeFound() {
 				sc.forEach((s)=>{
 					elRemover(s);
 				});
+				if(sl_uni.childElementCount>0){
+				let f=sl_uni.lastChild.offsetTop;
+				if(sl_uni.scrollTop>f){
+					sl_uni.scrollTop=f;
+				}
+				}else{
+					sl_uni.scrollTop=0;
+				}
 			}
 		}
 		fond_i++;
@@ -284,7 +292,7 @@ function drawChars(rd){
 				let u=lookup_unihan.filter((c)=>{return c[0]===h ;});
 				let s=document.createElement('section');
 				s.setAttribute('Hex',hx);
-				s.innerHTML='<section class="unihan_rad">'+t+'</section>';
+				s.innerHTML='<section class="unihan_rad">'+t+' ('+hx+')</section>';
 				u.forEach((a)=>{
 					s.innerHTML+='<section>'+a[1]+': '+a[2]+'</section>';
 				});
