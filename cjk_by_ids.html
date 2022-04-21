@@ -47,6 +47,9 @@ section#chars > blockquote.sel, section.unihan_char{
 section.unihan_rad{
     background: red !important;
 }
+section#sel_uni a.list_cmp {
+    font-size: initial;
+}
 h1{
     text-align: left;
     margin-left: 16.666666%;
@@ -77,6 +80,9 @@ var fond_i=0;
 var wInterval;
 var svg_scl=0.75;
 var lookup_unihan=unihan_readings.split('\n').map((r)=>{return r.split('\t')}).filter((r)=>{return r.length==3});
+let cmps=smp_components_byFreq.map((c)=>{return String.fromCodePoint(c[0]);});
+let cmps_lks=[];
+
 
 function elRemover(el){
 	if(typeof el!=='undefined' && !!el){
@@ -146,6 +152,7 @@ function writeFound() {
 		b.onclick=()=>{
 		let hx=b.getAttribute('Hex');
 			if(b.getAttribute('sel')=="false"){
+			var sc=document.createElement('section');
 				b.setAttribute('sel',true);
 				b.className='sel';
 				let h=hx.replace('0x','U+');
@@ -153,8 +160,35 @@ function writeFound() {
 				let s=document.createElement('section');
 				s.setAttribute('Hex',hx);
 				s.innerHTML='<section class="unihan_char">'+b.innerText+' ('+hx+')</section>';
+				let c_cmpns=0;
+				let c_match=ch_comp2.filter((c)=>{return hx==c[0];});
+				c_match.forEach((c)=>{
+					let chr=String.fromCodePoint(c[0]);
+						for(let i=1, len=c.length; i<len; i++){
+							if(c[i]!=chr && cmps.includes(c[i])){
+										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+										let lnk=document.createElement('A');
+										lnk.innerText=c[i];
+										lnk.className="list_cmp";
+										if(c_cmpns==0){
+												sc.innerText='Components: ';
+												c_cmpns++;
+										}
+										if(ix>=0){
+											sc.appendChild(lnk);
+											lnk.setAttribute('onclick',`cmps_lks[${ix}].scrollIntoView();`);
+										}else{
+											sc.appendChild(lnk);
+										}
+							}
+					}
+				});
+					if(c_cmpns>0){
+						s.appendChild(sc);
+					}
+					
 				u.forEach((a)=>{
-					s.innerHTML+='<section>'+a[1]+': '+a[2]+'</section>';
+					s.innerHTML+='<section>'+a[1].replace('k','')+': '+a[2]+'</section>';
 				});
 				s.innerHTML+='<br>';
 				sl_uni.appendChild(s);
@@ -203,6 +237,10 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 		let ud=svgs.filter((s)=>{return s[0]==arr[i][0];});
 		let t=String.fromCodePoint(arr[i][0]);
 		lk.innerHTML=t;
+		let ix=cmps.findIndex((c)=>{return c==t});
+		if(ix>=0){
+			cmps_lks[ix]=lk;
+		}
 		if(ud.length>0){
 		cmp.appendChild(lk);
 		let lrct=absBoundingClientRect(lk);
@@ -236,8 +274,8 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 		}
 	}
 	
-	let lnk=[...cmp.getElementsByTagName('a')];
-	lnk.forEach((lk)=>{
+	cmps_lks=[...cmp.getElementsByTagName('a')];
+	cmps_lks.forEach((lk)=>{
 			lk.onclick=()=>{
 			stopWriteFound();
 			if(lk.className==='rad'){
@@ -283,18 +321,45 @@ function drawChars(rd){
 					let hx= d.getAttribute("Hex");
 		let t=String.fromCodePoint(hx);			
 		let ud=svgs.filter((s)=>{return s[0]==hx;});
-		
 					incl.push(t);
 					r.innerHTML=t;
 					let ix=[...sl_uni.getElementsByTagName('SECTION')].findIndex((s)=>{return !!s.getAttribute('Hex') && s.getAttribute('Hex')==hx;});
 		if(ix<0){
+				var sc=document.createElement('section');
 				let h=hx.replace('0x','U+');
 				let u=lookup_unihan.filter((c)=>{return c[0]===h ;});
 				let s=document.createElement('section');
 				s.setAttribute('Hex',hx);
 				s.innerHTML='<section class="unihan_rad">'+t+' ('+hx+')</section>';
+				let c_cmpns=0;
+				let c_match=ch_comp2.filter((c)=>{return hx==c[0];});
+				c_match.forEach((c)=>{
+					let chr=String.fromCodePoint(c[0]);
+						for(let i=1, len=c.length; i<len; i++){
+							if(c[i]!=chr && cmps.includes(c[i])){
+										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+										let lnk=document.createElement('A');
+										lnk.innerText=c[i];
+										lnk.className="list_cmp";
+										if(c_cmpns==0){
+												sc.innerText='Components: ';
+												c_cmpns++;
+										}
+										if(ix>=0){
+											sc.appendChild(lnk);
+											lnk.setAttribute('onclick',`cmps_lks[${ix}].scrollIntoView();`);
+										}else{
+											sc.appendChild(lnk);
+										}
+							}
+					}
+				});
+					if(c_cmpns>0){
+						s.appendChild(sc);
+					}
+					
 				u.forEach((a)=>{
-					s.innerHTML+='<section>'+a[1]+': '+a[2]+'</section>';
+					s.innerHTML+='<section>'+a[1].replace('k','')+': '+a[2]+'</section>';
 				});
 				s.innerHTML+='<br>';
 				sl_uni.appendChild(s);
