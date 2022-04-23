@@ -47,6 +47,9 @@ section#chars > blockquote.sel, section.unihan_char{
 section.unihan_rad{
     background: red !important;
 }
+section.txtb_char{
+    background: #721372 !important;
+}
 section#sel_uni a.list_cmp {
     font-size: initial;
 }
@@ -60,7 +63,10 @@ h1{
 	
 <body>
 <h1>CJK By IDS</h1>
-<section id="sel_uni" style="position: absolute;"></section>
+<section id="sel_uni_txt"  style="position: absolute;">
+<textarea id="txtb"></textarea>
+<section id="sel_uni"></section>
+</section>
 <select id="order" style="background-color: buttonface;" title="Sort by"></select>
 <button id="clear_er" style="background-color: buttonface;">Clear all selections</button>
 <section id="txt"><br>
@@ -75,6 +81,8 @@ var cmp=document.getElementById("components");
 var chs=document.getElementById("chars");
 var clr=document.getElementById("clear_er");
 var sl_uni=document.getElementById("sel_uni");
+var sl_uni_tx=document.getElementById("sel_uni_txt");
+var txtbx=document.getElementById("txtb");
 var fond=[];
 var fond_i=0;
 var wInterval;
@@ -82,7 +90,16 @@ var svg_scl=0.75;
 var lookup_unihan=unihan_readings.split('\n').map((r)=>{return r.split('\t')}).filter((r)=>{return r.length==3});
 let cmps=smp_components_byFreq.map((c)=>{return String.fromCodePoint(c[0]);});
 let cmps_lks=[];
+var lastInteract=null;
 
+function sortByCol(arr, colIndex){
+    arr.sort(sortFunction);
+    function sortFunction(a, b) {
+        a = a[colIndex]
+        b = b[colIndex]
+        return (a === b) ? 0 : (a < b) ? 1 : -1
+    }
+}
 
 function elRemover(el){
 	if(typeof el!=='undefined' && !!el){
@@ -140,35 +157,58 @@ function getClientBoundingMiddles(r){
 	return {v: 0.5*r.height+r.top, h: 0.5*r.width+r.left};
 }
 
-function writeFound() {
-	try{
-		let b=document.createElement('blockquote');
-		b.className='char';
-		b.setAttribute('Hex',fond[fond_i][0]);
-		b.title=fond[fond_i][0];
-		b.setAttribute('sel',false);
-		b.innerText=fond[fond_i][1];
-		chars.appendChild(b);
-		b.onclick=()=>{
-		let hx=b.getAttribute('Hex');
-			if(b.getAttribute('sel')=="false"){
+function txtBx_inp(){
+txtbx.style.height = '0px';
+txtbx.style.height = (txtbx.scrollHeight+7)+"px";
+let cs=[...txtbx.value];
+
+let scts=[...sl_uni.querySelectorAll('section.txtb_char_ctn')];
+scts.forEach((x)=>{
+	elRemover(x);
+});
+
+cs.forEach((ch)=>{
+
+		let x=ch.codePointAt(0).toString(16).toLocaleUpperCase();
+		let hx='0x'+x;
+
 			var sc=document.createElement('section');
-				b.setAttribute('sel',true);
-				b.className='sel';
-				let h=hx.replace('0x','U+');
-				let u=lookup_unihan.filter((c)=>{return c[0]===h ;});
+				let h='U+'+x;
+				let u=lookup_unihan.filter((c)=>{return c[0]===h;});
+				if(!!lastInteract && typeof lastInteract!=='undefined'){
+					sl_uni_tx.scrollTop=lastInteract.offsetTop;
+				}
+if(u.length>0){
 				let s=document.createElement('section');
+				s.className="txtb_char_ctn";
 				s.setAttribute('Hex',hx);
-				s.innerHTML='<section class="unihan_char">'+b.innerText+' ('+hx+')</section>';
+				s.innerHTML='<section class="txtb_char">'+ch+' ('+hx+')</section>';
 				let c_cmpns=0;
-				let c_match=ch_comp2.filter((c)=>{return hx==c[0];});
+				let c_match=JSON.parse(JSON.stringify(ch_comp2.filter((c)=>{return hx==c[0];})));
+				c_match.forEach((c)=>{
+					let c_og=c.map((a)=>{return a;});
+					let c_match01=[[0,-2]];
+						for(let i=1, len=c.length; i<len; i++){
+								let ix=smp_components_bySc.findIndex((l)=>{return l[0]=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+								c_match01.push([i,ix]);
+						}
+						sortByCol(c_match01,1);
+						let l=c_match01.length-1;
+							for(let k=1; k<c_og.length; k++){
+								c[k]=c_og[c_match01[l-k][0]];
+							}
+				});
+
 				c_match.forEach((c)=>{
 					let chr=String.fromCodePoint(c[0]);
+					let dup=[];
 						for(let i=1, len=c.length; i<len; i++){
-							if(c[i]!=chr && cmps.includes(c[i])){
+							if(cmps.includes(c[i]) && !dup.includes(c[i])){
 										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
 										let lnk=document.createElement('A');
 										lnk.innerText=c[i];
+										lnk.title=cmps_lks[ix].title;
+										dup.push(c[i]);
 										lnk.className="list_cmp";
 										if(c_cmpns==0){
 												sc.innerText='Components: ';
@@ -192,7 +232,98 @@ function writeFound() {
 				});
 				s.innerHTML+='<br>';
 				sl_uni.appendChild(s);
-				sl_uni.scrollTop=s.offsetTop;
+				sl_uni_tx.appendChild(sl_uni);
+				if(lastInteract==null || typeof lastInteract==='undefined'){
+					sl_uni_tx.scrollTop=s.offsetTop;
+				}		
+}
+});
+
+
+}
+
+txtbx.oninput= function(event) {
+	lastInteract=null;
+	txtBx_inp();
+	
+}
+
+txtbx.value='例子';
+
+function writeFound() {
+if(fond_i>fond.length-1){
+	stopWriteFound();
+}else{
+		let b=document.createElement('blockquote');
+		b.className='char';
+		b.setAttribute('Hex',fond[fond_i][0]);
+		b.title=fond[fond_i][0];
+		b.setAttribute('sel',false);
+		b.innerText= String.fromCodePoint(fond[fond_i][0]);
+		chars.appendChild(b);
+		b.onclick=()=>{
+		let hx=b.getAttribute('Hex');
+			if(b.getAttribute('sel')=="false"){
+			var sc=document.createElement('section');
+				b.setAttribute('sel',true);
+				b.className='sel';
+				let h=hx.replace('0x','U+');
+				let u=lookup_unihan.filter((c)=>{return c[0]===h ;});
+				let s=document.createElement('section');
+				s.setAttribute('Hex',hx);
+				s.innerHTML='<section class="unihan_char">'+b.innerText+' ('+hx+')</section>';
+				let c_cmpns=0;
+				let c_match=JSON.parse(JSON.stringify(ch_comp2.filter((c)=>{return hx==c[0];})));
+				c_match.forEach((c)=>{
+					let c_og=c.map((a)=>{return a;});
+					let c_match01=[[0,-2]];
+						for(let i=1, len=c.length; i<len; i++){
+								let ix=smp_components_bySc.findIndex((l)=>{return l[0]=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+								c_match01.push([i,ix]);
+						}
+						sortByCol(c_match01,1);
+						let l=c_match01.length-1;
+							for(let k=1; k<c_og.length; k++){
+								c[k]=c_og[c_match01[l-k][0]];
+							}
+				});
+
+				c_match.forEach((c)=>{
+					let chr=String.fromCodePoint(c[0]);
+					let dup=[];
+						for(let i=1, len=c.length; i<len; i++){
+							if(cmps.includes(c[i]) && !dup.includes(c[i])){
+										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+										let lnk=document.createElement('A');
+										lnk.innerText=c[i];
+										lnk.title=cmps_lks[ix].title;
+										dup.push(c[i]);
+										lnk.className="list_cmp";
+										if(c_cmpns==0){
+												sc.innerText='Components: ';
+												c_cmpns++;
+										}
+										if(ix>=0){
+											sc.appendChild(lnk);
+											lnk.setAttribute('onclick',`cmps_lks[${ix}].scrollIntoView();`);
+										}else{
+											sc.appendChild(lnk);
+										}
+							}
+					}
+				});
+					if(c_cmpns>0){
+						s.appendChild(sc);
+					}
+					
+				u.forEach((a)=>{
+					s.innerHTML+='<section>'+a[1].replace('k','')+': '+a[2]+'</section>';
+				});
+				s.innerHTML+='<br>';
+				sl_uni.appendChild(s);
+				lastInteract=s;
+				sl_uni_tx.appendChild(sl_uni);
+				sl_uni_tx.scrollTop=s.offsetTop;
 			}else{
 				b.setAttribute('sel',false);
 				b.className='char';
@@ -200,18 +331,11 @@ function writeFound() {
 				sc.forEach((s)=>{
 					elRemover(s);
 				});
-				if(sl_uni.childElementCount>0){
-				let f=sl_uni.lastChild.offsetTop;
-				if(sl_uni.scrollTop>f){
-					sl_uni.scrollTop=f;
-				}
-				}else{
-					sl_uni.scrollTop=0;
-				}
 			}
+					 txtBx_inp();
 		}
 		fond_i++;
-	}catch(e){;}
+	}
 
 }
 function stopWriteFound() {
@@ -232,6 +356,7 @@ cmp.innerHTML='';
 for(let i=0; len_i=arr.length, i<len_i; i++){
 		let lk=document.createElement('a');
 		lk.setAttribute("Hex",arr[i][0]);
+		lk.setAttribute("Stroke_count",arr[i][3]);
 		lk.title=arr[i][0]+' (Stroke count: '+arr[i][3]+')';
 		lk.setAttribute("Hex",arr[i][0]);
 		let ud=svgs.filter((s)=>{return s[0]==arr[i][0];});
@@ -309,8 +434,10 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 					elRemover(s);
 				});
 			}
+			txtBx_inp();
 		};
 });
+txtBx_inp();
 }
 
 function drawChars(rd){
@@ -332,14 +459,31 @@ function drawChars(rd){
 				s.setAttribute('Hex',hx);
 				s.innerHTML='<section class="unihan_rad">'+t+' ('+hx+')</section>';
 				let c_cmpns=0;
-				let c_match=ch_comp2.filter((c)=>{return hx==c[0];});
+				let c_match=JSON.parse(JSON.stringify(ch_comp2.filter((c)=>{return hx==c[0];})));
+				c_match.forEach((c)=>{
+					let c_og=c.map((a)=>{return a;});
+					let c_match01=[[0,-2]];
+						for(let i=1, len=c.length; i<len; i++){
+								let ix=smp_components_bySc.findIndex((l)=>{return l[0]=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+								c_match01.push([i,ix]);
+						}
+						sortByCol(c_match01,1);
+						let l=c_match01.length-1;
+							for(let k=1; k<c_og.length; k++){
+								c[k]=c_og[c_match01[l-k][0]];
+							}
+				});
+
 				c_match.forEach((c)=>{
 					let chr=String.fromCodePoint(c[0]);
+					let dup=[];
 						for(let i=1, len=c.length; i<len; i++){
-							if(c[i]!=chr && cmps.includes(c[i])){
+							if(cmps.includes(c[i]) && !dup.includes(c[i])){
 										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
 										let lnk=document.createElement('A');
 										lnk.innerText=c[i];
+										lnk.title=cmps_lks[ix].title;
+										dup.push(c[i]);
 										lnk.className="list_cmp";
 										if(c_cmpns==0){
 												sc.innerText='Components: ';
@@ -363,7 +507,8 @@ function drawChars(rd){
 				});
 				s.innerHTML+='<br>';
 				sl_uni.appendChild(s);
-				sl_uni.scrollTop=s.offsetTop;
+				lastInteract=s;
+				sl_uni_tx.appendChild(sl_uni);
 			}
 		if(ud.length>0){
 		chars.appendChild(r);
@@ -416,6 +561,7 @@ function drawChars(rd){
 fond_i=0;
 wInterval = setInterval(writeFound,0);
 				chars.scrollIntoView();
+							txtBx_inp();
 }
 
 function clearAll(){
@@ -432,6 +578,7 @@ stopWriteFound();
 	sc.forEach((s)=>{
 		elRemover(s);
 	});
+		txtBx_inp();
 }
 
 clr.onclick=()=>{
@@ -456,6 +603,7 @@ var trg=null;
 			k[0].scrollIntoView();
 		}		
 	}
+		txtBx_inp();
 }
 
 slc.oninput=()=>{
@@ -466,17 +614,26 @@ drawCmp();
 
 function unibox_rsz(first){
 	let h1Rct=absBoundingClientRect(chs);
-	sl_uni.style.left=h1Rct.left+'px';
-	sl_uni.style.top='2px';
-	sl_uni.style.width=h1Rct.width+'px';
+	sl_uni_tx.style.left=h1Rct.left+'px';
+	sl_uni_tx.style.top='2px';
+	sl_uni_tx.style.width=h1Rct.width+'px';
 	let hgt=h1Rct.top-2;
-	sl_uni.style.height=(hgt)+'px';
-	sl_uni.style.minHeight=(hgt)+'px';
-	sl_uni.style.paddingLeft='0px';
-	sl_uni.style.marginTop='0px';
-	sl_uni.style.marginBottom='0px';
-	sl_uni.style.overflowY='scroll';
-	sl_uni.style.resize='vertical';
+	sl_uni_tx.style.height=(hgt)+'px';
+	sl_uni_tx.style.minHeight=(hgt)+'px';
+	sl_uni_tx.style.paddingLeft='0px';
+	sl_uni_tx.style.marginTop='0px';
+	sl_uni_tx.style.marginBottom='0px';
+	sl_uni_tx.style.overflowY='scroll';
+	sl_uni_tx.style.resize='vertical';
+	sl_uni_tx.style.display='flex';
+	sl_uni_tx.style.alignItems='flex-start';
+	sl_uni.style.marginLeft='2px';
+	sl_uni.style.width='-webkit-fill-available';
+	txtbx.style.height = '0px';
+	txtbx.style.height = (txtbx.scrollHeight+7)+"px";
+	txtbx.style.width = '0px';
+	txtbx.style.width = (txtbx.scrollWidth+55)+"px";
+	txtbx.style.background = "#721372";
 	if(first){
 		chs.setAttribute('top_pos',h1Rct.top);
 	}
@@ -493,7 +650,7 @@ const resizeObserver = new ResizeObserver(entries => {
   }
 });
 
-resizeObserver.observe(sl_uni);
+resizeObserver.observe(sl_uni_tx);
 
 window.addEventListener('resize',function(e){
 unibox_rsz(false);
