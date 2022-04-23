@@ -245,7 +245,6 @@ if(u.length>0){
 txtbx.oninput= function(event) {
 	lastInteract=null;
 	txtBx_inp();
-	
 }
 
 txtbx.value='例子';
@@ -331,6 +330,14 @@ if(fond_i>fond.length-1){
 				sc.forEach((s)=>{
 					elRemover(s);
 				});
+				/*if(sl_uni.childElementCount>0){
+				let f=sl_uni.lastChild.offsetTop;
+				if(sl_uni.scrollTop>f){
+					sl_uni.scrollTop=f;
+				}
+				}else{
+					sl_uni.scrollTop=0;
+				}*/
 			}
 					 txtBx_inp();
 		}
