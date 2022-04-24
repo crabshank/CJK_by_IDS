@@ -34,20 +34,35 @@ section#components > a.cmp_svg{
     display: inline !important;
 }
 section#components > a.rad, section#chars > blockquote.rad{
+	color: white !important;
     background: red !important;
     display: inline-flex !important;
 }
 section#components > a.rad_svg, section#chars > blockquote.rad_svg{
+	color: white !important;
     background: red !important;
     display: inline !important;
 }
+section#components > a.hl, section#components > a.hl_sel{
+	color: white !important;
+    background: #145a7c !important;
+    display: inline-flex !important;
+}
+section#components > a.hl_svg, section#components > a.hl_svg_sel{
+	color: white !important;
+    background: #145a7c !important;
+    display: inline !important;
+}
 section#chars > blockquote.sel, section.unihan_char{
+	color: white !important;
     background: green !important;
 }
 section.unihan_rad{
+	color: white !important;
     background: red !important;
 }
 section.txtb_char{
+    color: white !important;
     background: #721372 !important;
 }
 section#sel_uni a.list_cmp {
@@ -182,7 +197,7 @@ if(u.length>0){
 				let s=document.createElement('section');
 				s.className="txtb_char_ctn";
 				s.setAttribute('Hex',hx);
-				s.innerHTML='<section class="txtb_char">'+ch+' ('+hx+')</section>';
+				s.innerHTML='<section class="txtb_char" style="display: flow-root; padding-left: 0.16ch;">'+ch+' ('+hx+')<button onclick="elRemover(this.parentElement.parentElement);" style="float: right; background: buttonface">🗙</button></section>';
 				let c_cmpns=0;
 				let c_match=JSON.parse(JSON.stringify(ch_comp2.filter((c)=>{return hx==c[0];})));
 				c_match.forEach((c)=>{
@@ -204,7 +219,7 @@ if(u.length>0){
 					let dup=[];
 						for(let i=1, len=c.length; i<len; i++){
 							if(cmps.includes(c[i]) && !dup.includes(c[i])){
-										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('Hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
 										let lnk=document.createElement('A');
 										lnk.innerText=c[i];
 										lnk.title=cmps_lks[ix].title;
@@ -216,7 +231,7 @@ if(u.length>0){
 										}
 										if(ix>=0){
 											sc.appendChild(lnk);
-											lnk.setAttribute('onclick',`cmps_lks[${ix}].scrollIntoView();`);
+											lnk.setAttribute('onclick',`cmps_lks[${ix}].scrollIntoView(); let cn=cmps_lks[${ix}].className; if(cn=='cmp'){cmps_lks[${ix}].className='hl_sel';}else if(cn=='cmp_svg'){cmps_lks[${ix}].className='hl_svg_sel';}`);
 										}else{
 											sc.appendChild(lnk);
 										}
@@ -230,7 +245,7 @@ if(u.length>0){
 				u.forEach((a)=>{
 					s.innerHTML+='<section>'+a[1].replace('k','')+': '+a[2]+'</section>';
 				});
-				s.innerHTML+='<br>';
+				s.style.marginBottom='1.7%';
 				sl_uni.appendChild(s);
 				sl_uni_tx.appendChild(sl_uni);
 				if(lastInteract==null || typeof lastInteract==='undefined'){
@@ -245,6 +260,7 @@ if(u.length>0){
 txtbx.oninput= function(event) {
 	lastInteract=null;
 	txtBx_inp();
+	setTimeout(()=>{sl_uni_tx.scrollTop=sl_uni.lastChild.offsetTop;},0);
 }
 
 txtbx.value='例子';
@@ -270,7 +286,7 @@ if(fond_i>fond.length-1){
 				let u=lookup_unihan.filter((c)=>{return c[0]===h ;});
 				let s=document.createElement('section');
 				s.setAttribute('Hex',hx);
-				s.innerHTML='<section class="unihan_char">'+b.innerText+' ('+hx+')</section>';
+				s.innerHTML='<section class="unihan_char" style="display: flow-root; padding-left: 0.16ch;">'+b.innerText+' ('+hx+')<button onclick="elRemover(this.parentElement.parentElement);" style="float: right; background: buttonface">🗙</button></section>';
 				let c_cmpns=0;
 				let c_match=JSON.parse(JSON.stringify(ch_comp2.filter((c)=>{return hx==c[0];})));
 				c_match.forEach((c)=>{
@@ -292,7 +308,7 @@ if(fond_i>fond.length-1){
 					let dup=[];
 						for(let i=1, len=c.length; i<len; i++){
 							if(cmps.includes(c[i]) && !dup.includes(c[i])){
-										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('Hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
 										let lnk=document.createElement('A');
 										lnk.innerText=c[i];
 										lnk.title=cmps_lks[ix].title;
@@ -304,7 +320,7 @@ if(fond_i>fond.length-1){
 										}
 										if(ix>=0){
 											sc.appendChild(lnk);
-											lnk.setAttribute('onclick',`cmps_lks[${ix}].scrollIntoView();`);
+											lnk.setAttribute('onclick',`cmps_lks[${ix}].scrollIntoView(); let cn=cmps_lks[${ix}].className; if(cn=='cmp'){cmps_lks[${ix}].className='hl_sel';}else if(cn=='cmp_svg'){cmps_lks[${ix}].className='hl_svg_sel';}`);
 										}else{
 											sc.appendChild(lnk);
 										}
@@ -318,7 +334,7 @@ if(fond_i>fond.length-1){
 				u.forEach((a)=>{
 					s.innerHTML+='<section>'+a[1].replace('k','')+': '+a[2]+'</section>';
 				});
-				s.innerHTML+='<br>';
+				s.style.marginBottom='1.7%';
 				sl_uni.appendChild(s);
 				lastInteract=s;
 				sl_uni_tx.appendChild(sl_uni);
@@ -410,38 +426,51 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 	cmps_lks.forEach((lk)=>{
 			lk.onclick=()=>{
 			stopWriteFound();
+			var upd_tx=false;
+			var og_cn=lk.className;
 			if(lk.className==='rad'){
+				lk.className='hl';
+				let sc=[...sl_uni.getElementsByTagName('SECTION')].filter((s)=>{return !!lk.getAttribute('Hex') && lk.getAttribute('Hex')==s.getAttribute('Hex');});
+					sc.forEach((s)=>{
+						elRemover(s);
+					});
+					upd_tx=true;
+			}else if(lk.className==='hl'){
 				lk.className='cmp';
-			let sc=[...sl_uni.getElementsByTagName('SECTION')].filter((s)=>{return !!lk.getAttribute('Hex') && lk.getAttribute('Hex')==s.getAttribute('Hex');});
-				sc.forEach((s)=>{
-					elRemover(s);
-				});
-				
+				upd_tx=true;
 			}else if(lk.className==='rad_svg'){
-				lk.className='cmp_svg';
+				lk.className='hl_svg';
 				
 				let sc=[...sl_uni.getElementsByTagName('SECTION')].filter((s)=>{return !!lk.getAttribute('Hex') && lk.getAttribute('Hex')==s.getAttribute('Hex');});
 				sc.forEach((s)=>{
 					elRemover(s);
 				});
-				
-			}else if(lk.className==='cmp_svg'){
+				upd_tx=true;
+			}else if(lk.className==='hl_svg'){
+				lk.className='cmp_svg';
+				upd_tx=true;
+			}else if(lk.className==='cmp_svg' || lk.className==='hl_svg_sel'){
 				lk.className='rad_svg';
-			}else if(lk.className==='cmp'){
+			}else if(lk.className==='cmp' || lk.className==='hl_sel'){
 				lk.className='rad';
 			}
-			let rd=[...cmp.querySelectorAll('a.rad'), ...cmp.querySelectorAll('a.rad_svg')];
-			
-			chars.innerHTML='';
-			if(rd.length>0){
-				drawChars(rd);
-			}else{
-				let sc=[...sl_uni.getElementsByTagName('SECTION')];
-				sc.forEach((s)=>{
-					elRemover(s);
-				});
+
+		if(og_cn!='hl'&& og_cn!='hl_svg'){
+				let rd=[...cmp.querySelectorAll('a.rad'), ...cmp.querySelectorAll('a.rad_svg')];
+				
+				chars.innerHTML='';
+					if(rd.length>0){
+						drawChars(rd);
+					}else{
+						let sc=[...sl_uni.getElementsByTagName('SECTION')];
+						sc.forEach((s)=>{
+							elRemover(s);
+						});
+					}
 			}
-			txtBx_inp();
+			if(upd_tx){
+				txtBx_inp();
+			}
 		};
 });
 txtBx_inp();
@@ -464,7 +493,7 @@ function drawChars(rd){
 				let u=lookup_unihan.filter((c)=>{return c[0]===h ;});
 				let s=document.createElement('section');
 				s.setAttribute('Hex',hx);
-				s.innerHTML='<section class="unihan_rad">'+t+' ('+hx+')</section>';
+				s.innerHTML='<section class="unihan_rad" style="display: flow-root; padding-left: 0.16ch;">'+t+' ('+hx+')<button onclick="elRemover(this.parentElement.parentElement);" style="float: right; background: buttonface">🗙</button></section>';
 				let c_cmpns=0;
 				let c_match=JSON.parse(JSON.stringify(ch_comp2.filter((c)=>{return hx==c[0];})));
 				c_match.forEach((c)=>{
@@ -486,7 +515,7 @@ function drawChars(rd){
 					let dup=[];
 						for(let i=1, len=c.length; i<len; i++){
 							if(cmps.includes(c[i]) && !dup.includes(c[i])){
-										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('Hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
 										let lnk=document.createElement('A');
 										lnk.innerText=c[i];
 										lnk.title=cmps_lks[ix].title;
@@ -498,7 +527,7 @@ function drawChars(rd){
 										}
 										if(ix>=0){
 											sc.appendChild(lnk);
-											lnk.setAttribute('onclick',`cmps_lks[${ix}].scrollIntoView();`);
+											lnk.setAttribute('onclick',`cmps_lks[${ix}].scrollIntoView(); let cn=cmps_lks[${ix}].className; if(cn=='cmp'){cmps_lks[${ix}].className='hl_sel';}else if(cn=='cmp_svg'){cmps_lks[${ix}].className='hl_svg_sel';}`);
 										}else{
 											sc.appendChild(lnk);
 										}
@@ -512,7 +541,7 @@ function drawChars(rd){
 				u.forEach((a)=>{
 					s.innerHTML+='<section>'+a[1].replace('k','')+': '+a[2]+'</section>';
 				});
-				s.innerHTML+='<br>';
+				s.style.marginBottom='1.7%';
 				sl_uni.appendChild(s);
 				lastInteract=s;
 				sl_uni_tx.appendChild(sl_uni);
@@ -641,6 +670,7 @@ function unibox_rsz(first){
 	txtbx.style.width = '0px';
 	txtbx.style.width = (txtbx.scrollWidth+55)+"px";
 	txtbx.style.background = "#721372";
+	txtbx.style.color = "white";
 	if(first){
 		chs.setAttribute('top_pos',h1Rct.top);
 	}
