@@ -607,7 +607,7 @@ wInterval = setInterval(writeFound,0);
 function clearAll(){
 stopWriteFound();
 	chars.innerHTML='';
-	let rd=[...cmp.querySelectorAll('a.rad')];	
+	let rd=[...cmp.querySelectorAll('a.rad'), ...cmp.querySelectorAll('a.rad_svg'), ...cmp.querySelectorAll('a.hl'), ...cmp.querySelectorAll('a.hl_svg'), ...cmp.querySelectorAll('a.hl_sel')];	
 	if(rd.length>0){
 		rd.forEach((d)=>{
 			d.className='';
