@@ -420,9 +420,11 @@ for(let i=0; len_i=arr.length, i<len_i; i++){
 				dv.style.transform="scale("+scl+") translate("+(l_m.h-s_m.h)+"px, "+(l_m.v-s_m.v)+"px)";
 				dv.style.verticalAlign='text-bottom';
 				lk.className='cmp_svg';
+				lk.setAttribute('og_class','cmp_svg');
 		}else{
 			cmp.appendChild(lk);
 			lk.className='cmp';
+			lk.setAttribute('og_class','cmp');
 		}
 	}
 	
@@ -610,7 +612,7 @@ stopWriteFound();
 	let rd=[...cmp.querySelectorAll('a.rad'), ...cmp.querySelectorAll('a.rad_svg'), ...cmp.querySelectorAll('a.hl'), ...cmp.querySelectorAll('a.hl_svg'), ...cmp.querySelectorAll('a.hl_sel')];	
 	if(rd.length>0){
 		rd.forEach((d)=>{
-			d.className='';
+			d.className=d.getAttribute('og_class');
 		});
 	}
 
