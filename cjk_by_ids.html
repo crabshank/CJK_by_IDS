@@ -107,6 +107,10 @@ let cmps=smp_components_byFreq.map((c)=>{return String.fromCodePoint(c[0]);});
 let cmps_lks=[];
 var lastInteract=null;
 
+function charTo_0x_Notation(c){
+	return '0x'+c.codePointAt(0).toString(16).toLocaleUpperCase();
+}
+
 function sortByCol(arr, colIndex){
     arr.sort(sortFunction);
     function sortFunction(a, b) {
@@ -204,7 +208,7 @@ if(u.length>0){
 					let c_og=c.map((a)=>{return a;});
 					let c_match01=[[0,-2]];
 						for(let i=1, len=c.length; i<len; i++){
-								let ix=smp_components_bySc.findIndex((l)=>{return l[0]=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+								let ix=smp_components_bySc.findIndex((l)=>{return l[0]==charTo_0x_Notation(c[i]);});
 								c_match01.push([i,ix]);
 						}
 						sortByCol(c_match01,1);
@@ -219,7 +223,7 @@ if(u.length>0){
 					let dup=[];
 						for(let i=1, len=c.length; i<len; i++){
 							if(cmps.includes(c[i]) && !dup.includes(c[i])){
-										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('Hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('Hex')==charTo_0x_Notation(c[i]);});
 										let lnk=document.createElement('A');
 										lnk.innerText=c[i];
 										lnk.title=cmps_lks[ix].title;
@@ -293,7 +297,7 @@ if(fond_i>fond.length-1){
 					let c_og=c.map((a)=>{return a;});
 					let c_match01=[[0,-2]];
 						for(let i=1, len=c.length; i<len; i++){
-								let ix=smp_components_bySc.findIndex((l)=>{return l[0]=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+								let ix=smp_components_bySc.findIndex((l)=>{return l[0]==charTo_0x_Notation(c[i]);});
 								c_match01.push([i,ix]);
 						}
 						sortByCol(c_match01,1);
@@ -308,7 +312,7 @@ if(fond_i>fond.length-1){
 					let dup=[];
 						for(let i=1, len=c.length; i<len; i++){
 							if(cmps.includes(c[i]) && !dup.includes(c[i])){
-										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('Hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('Hex')==charTo_0x_Notation(c[i]);});
 										let lnk=document.createElement('A');
 										lnk.innerText=c[i];
 										lnk.title=cmps_lks[ix].title;
@@ -500,7 +504,7 @@ function drawChars(rd){
 					let c_og=c.map((a)=>{return a;});
 					let c_match01=[[0,-2]];
 						for(let i=1, len=c.length; i<len; i++){
-								let ix=smp_components_bySc.findIndex((l)=>{return l[0]=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+								let ix=smp_components_bySc.findIndex((l)=>{return l[0]==charTo_0x_Notation(c[i]);});
 								c_match01.push([i,ix]);
 						}
 						sortByCol(c_match01,1);
@@ -515,7 +519,7 @@ function drawChars(rd){
 					let dup=[];
 						for(let i=1, len=c.length; i<len; i++){
 							if(cmps.includes(c[i]) && !dup.includes(c[i])){
-										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('Hex')=='0x'+c[i].codePointAt(0).toString(16).toLocaleUpperCase()});
+										let ix=cmps_lks.findIndex((l)=>{return l.getAttribute('Hex')==charTo_0x_Notation(c[i]);});
 										let lnk=document.createElement('A');
 										lnk.innerText=c[i];
 										lnk.title=cmps_lks[ix].title;
