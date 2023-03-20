@@ -17,7 +17,7 @@ let glyphsSvgUnk=glyphsSvg.filter((g)=>{return known_undisplayed_glyphs.includes
 */
 
 /* TO REGENERATE AFTER ADDDING SVG PATHS:
-let v=svgs.map(s=>{return s[0]}); let k=known_undisplayed_glyphs.filter((g)=>{return !v.includes(g);}); console.log(k);
+let v=glyphsSvgUnk.map(s=>{return s[0]}); let k=known_undisplayed_glyphs.filter((g)=>{return !v.includes(g);}); console.log(k);
 */
 
 const known_undisplayed_glyphs=[
@@ -52,6 +52,5 @@ const known_undisplayed_glyphs=[
     "0x2CFF2",
     "0x2D085",
     "0x2C575",
-    "0x2CF19",
     "0x2D433"
 ];
