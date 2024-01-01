@@ -35,7 +35,6 @@ const known_undisplayed_glyphs=[
     "0x2DEB1",
     "0x2E5DF",
     "0x2E815",
-    "0x2BD5A",
     "0x2D422",
     "0x2CF0C",
     "0x2DD22",
